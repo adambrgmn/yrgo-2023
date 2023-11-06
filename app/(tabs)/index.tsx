@@ -3,6 +3,7 @@ import { DefaultTheme } from '@react-navigation/native';
 import { Link } from 'expo-router';
 import { Fragment } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 
 import { IconButton } from '../../lib/components/buttons';
 import { useTodo, useTodos } from '../../lib/data';
@@ -26,7 +27,9 @@ export default function TodosScreen() {
         sections={items.length === 0 ? [] : sections}
         keyExtractor={(item) => item}
         renderItem={({ item, index, section }) => (
-          <Todo id={item} first={index === 0} last={index === section.data.length - 1} />
+          <Animated.View key={item} entering={FadeInDown} exiting={FadeOutDown}>
+            <Todo id={item} first={index === 0} last={index === section.data.length - 1} />
+          </Animated.View>
         )}
         renderSectionHeader={({ section }) => (
           <Fragment>
