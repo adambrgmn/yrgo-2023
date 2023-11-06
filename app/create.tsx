@@ -1,25 +1,34 @@
 import { DefaultTheme } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Button, Platform, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Button, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTodos } from '../lib/data';
 
 export default function CreateModalScreen() {
   const router = useRouter();
-  const { query, create } = useTodos();
+  const { create } = useTodos();
+  const ref = useRef<TextInput>(null);
+  const [title, setTitle] = useState('');
+  const disabled = create.status === 'pending' || title === '';
 
-  const disabled = create.status === 'pending';
+  function handleCreate() {
+    if (title === '') return;
+    create.mutate({ title }, { onSuccess: router.back });
+  }
 
   return (
     <View style={styles.container}>
-      <Button
-        title="Create new item"
-        disabled={disabled}
-        onPress={() => {
-          create.mutate({ title: 'Todo ' + ((query.data?.items.length ?? 0) + 1) }, { onSuccess: router.back });
-        }}
+      <TextInput
+        ref={ref}
+        style={styles.input}
+        value={title}
+        onChangeText={setTitle}
+        onLayout={() => ref.current?.focus()}
+        onSubmitEditing={handleCreate}
       />
+      <Button title="Create new item" disabled={disabled} onPress={handleCreate} />
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
@@ -47,5 +56,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: DefaultTheme.colors.background,
+  },
+  input: {
+    height: 40,
+    padding: 10,
+    backgroundColor: DefaultTheme.colors.card,
+    borderRadius: 12,
   },
 });
