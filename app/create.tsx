@@ -1,7 +1,7 @@
 import { DefaultTheme } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTodos } from '../lib/data';
@@ -9,13 +9,19 @@ import { useTodos } from '../lib/data';
 export default function CreateModalScreen() {
   const router = useRouter();
   const { create } = useTodos();
-
+  const ref = useRef<TextInput>(null);
   const [title, setTitle] = useState('');
   const disabled = create.status === 'pending' || title === '';
 
   return (
     <View style={styles.container}>
-      <TextInput style={styles.input} onChangeText={setTitle} value={title} />
+      <TextInput
+        ref={ref}
+        style={styles.input}
+        value={title}
+        onChangeText={setTitle}
+        onLayout={() => ref.current?.focus()}
+      />
       <Button
         title="Create new item"
         disabled={disabled}
