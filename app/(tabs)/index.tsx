@@ -4,7 +4,7 @@ import { Link } from 'expo-router';
 import { Fragment } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { IconButton } from '../../lib/components/buttons';
+import { Swipeable } from '../../lib/components/swipable';
 import { useTodo, useTodos } from '../../lib/data';
 
 export default function TodosScreen() {
@@ -73,24 +73,38 @@ function Todo({ id, first, last }: { id: string; first: boolean; last: boolean }
   const todo = query.data;
 
   return (
-    <TouchableOpacity
-      style={StyleSheet.flatten([
-        todoStyle.container,
-        first ? todoStyle.containerTop : {},
-        last ? todoStyle.containerBottom : {},
-      ])}
-      onPress={() => update.mutate({ state: todo.state === 'completed' ? 'active' : 'completed' })}
+    <Swipeable
+      left={
+        todo.state === 'active' ? (
+          <Swipeable.Left onPress={() => update.mutate({ state: 'completed' })}>
+            <Icon name="check" size={16} color="white" />
+          </Swipeable.Left>
+        ) : null
+      }
+      right={
+        <Swipeable.Right onPress={() => remove.mutate()}>
+          <Icon name="trash" size={16} color="white" />
+        </Swipeable.Right>
+      }
     >
-      <Fragment>
-        {todo.state === 'completed' ? (
-          <Icon name="check" color="green" size={24} />
-        ) : (
-          <View style={{ width: 24, height: 24 }} />
-        )}
-        <Text style={todoStyle.title}>{todo.title}</Text>
-        <IconButton icon="trash" size={16} label="Remove" onPress={() => remove.mutate()} />
-      </Fragment>
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={StyleSheet.flatten([
+          todoStyle.container,
+          first ? todoStyle.containerTop : {},
+          last ? todoStyle.containerBottom : {},
+        ])}
+        onPress={() => update.mutate({ state: todo.state === 'completed' ? 'active' : 'completed' })}
+      >
+        <Fragment>
+          {todo.state === 'completed' ? (
+            <Icon name="check" color="green" size={24} />
+          ) : (
+            <View style={{ width: 24, height: 24 }} />
+          )}
+          <Text style={todoStyle.title}>{todo.title}</Text>
+        </Fragment>
+      </TouchableOpacity>
+    </Swipeable>
   );
 }
 
