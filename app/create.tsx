@@ -13,6 +13,11 @@ export default function CreateModalScreen() {
   const [title, setTitle] = useState('');
   const disabled = create.status === 'pending' || title === '';
 
+  function handleCreate() {
+    if (title === '') return;
+    create.mutate({ title }, { onSuccess: router.back });
+  }
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -21,15 +26,9 @@ export default function CreateModalScreen() {
         value={title}
         onChangeText={setTitle}
         onLayout={() => ref.current?.focus()}
+        onSubmitEditing={handleCreate}
       />
-      <Button
-        title="Create new item"
-        disabled={disabled}
-        onPress={() => {
-          if (title === '') return;
-          create.mutate({ title }, { onSuccess: router.back });
-        }}
-      />
+      <Button title="Create new item" disabled={disabled} onPress={handleCreate} />
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
